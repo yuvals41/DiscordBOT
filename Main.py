@@ -1,5 +1,5 @@
 import discord
-
+from decouple import config
 client = discord.Client()
 
 
@@ -24,4 +24,4 @@ async def on_ready():
     await send_Link("TwitterLinks_GokuBlue.txt", client.get_channel(890634130390409256), client.get_channel(890634130390409256).history(limit=None))
 
 
-client.run('ODg4MzczNjAyNzQxODAwOTcy.YURwZA.gg1v3u3cJCqDMRSdcct4XHVnTKE')
+client.run(config('TOKEN'))
