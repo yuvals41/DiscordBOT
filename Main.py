@@ -19,9 +19,9 @@ async def send_Link(filename, channel, history):
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-    await send_Link("TwitterLinks_A17.txt", client.get_channel('server id'), client.get_channel('server id').history(limit=None))
-    await send_Link("TwitterLinks_GokuBlack.txt", client.get_channel('server id'), client.get_channel('server id').history(limit=None))
-    await send_Link("TwitterLinks_GokuBlue.txt", client.get_channel('server id'), client.get_channel('server id').history(limit=None))
+    await send_Link("TwitterLinks_A17.txt", client.get_channel(888376010519740457), client.get_channel(888376010519740457).history(limit=None))
+    await send_Link("TwitterLinks_GokuBlack.txt", client.get_channel(890631861099970631), client.get_channel(890631861099970631).history(limit=None))
+    await send_Link("TwitterLinks_GokuBlue.txt", client.get_channel(890634130390409256), client.get_channel(890634130390409256).history(limit=None))
 
 
-client.run('')
+client.run('ODg4MzczNjAyNzQxODAwOTcy.YURwZA.gg1v3u3cJCqDMRSdcct4XHVnTKE')
