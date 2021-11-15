@@ -37,5 +37,5 @@ async def on_ready():
     await send_Link("TwitterLinks_GokuBlue.txt", client.get_channel(890634130390409256), history3)
     await client.close()
 
-
-client.run(config('TOKEN'))
+if __name__ == '__main__':
+    client.run(config('TOKEN'))
