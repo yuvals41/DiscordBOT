@@ -1,10 +1,9 @@
-from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import Main
+from decouple import config
 PATH = r"C:\Users\yuval\Desktop\Python projects\chromedriver.exe"
 # Path to the ChromeDriver
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36"
@@ -46,4 +45,4 @@ def get_links():
 
 original = get_links()
 
-Main.client.run("ODg4MzczNjAyNzQxODAwOTcy.YURwZA.9x0Z7JaqHO_b4R3r_NyiUlzae4A")       
+Main.client.run(config('TOKEN'))       
