@@ -1,9 +1,12 @@
-from logging import shutdown
 import discord
 from decouple import config
 
 client = discord.Client()
 
+### by default its set to 17 channel and file
+
+idd = 888376010519740457 
+file = "TwitterLinks_A17.txt"
 
 async def view_history(history):
     ls = list()
@@ -25,16 +28,17 @@ async def send_Link(filename, channel, history):
                 await channel.send(line)
             flag = True
 
+   
+def char(ident,name):
+    global idd, file
+    idd = ident
+    file = name
 
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
-    history1 = await view_history(await client.get_channel(888376010519740457).history(limit=None).flatten())
-    history2 = await view_history(await client.get_channel(890631861099970631).history(limit=None).flatten())
-    history3 = await view_history(await client.get_channel(890634130390409256).history(limit=None).flatten())
-    await send_Link("TwitterLinks_A17.txt", client.get_channel(888376010519740457), history1)
-    await send_Link("TwitterLinks_GokuBlack.txt", client.get_channel(890631861099970631), history2)
-    await send_Link("TwitterLinks_GokuBlue.txt", client.get_channel(890634130390409256), history3)
+    print('We have logged in as {0.user},{1},{2}'.format(client,idd,file))
+    history1 = await view_history(await client.get_channel(idd).history(limit=None).flatten())
+    await send_Link(file, client.get_channel(idd), history1)
     await client.close()
 
 if __name__ == '__main__':

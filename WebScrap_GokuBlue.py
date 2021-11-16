@@ -2,6 +2,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import os
 import Main
@@ -43,4 +44,7 @@ def get_links():
 
 
 original = get_links()
-Main.client.run(os.getenv('TOKEN'))
+
+Main.char(890634130390409256,"TwitterLinks_GokuBlue.txt")
+
+Main.client.run("ODg4MzczNjAyNzQxODAwOTcy.YURwZA.9x0Z7JaqHO_b4R3r_NyiUlzae4A")
