@@ -3,8 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from time import sleep
+import os
 import Main
 PATH = r"C:\Users\yuval\Desktop\Python projects\chromedriver.exe"
 # Path to the ChromeDriver
@@ -44,4 +43,4 @@ def get_links():
 
 
 original = get_links()
-Main.client.run('ODg4MzczNjAyNzQxODAwOTcy.YURwZA.ON1FMJIlxuuAr3fBgmtvOh5jr1Y')
+Main.client.run(os.getenv('TOKEN'))
