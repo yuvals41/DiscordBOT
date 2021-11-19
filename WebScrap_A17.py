@@ -2,9 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import os
+from datetime import datetime
 import Main
-from decouple import config
-PATH = r"C:\Users\yuval\Desktop\Python projects\chromedriver.exe"
+PATH = r"/home/master/discord/chromedriver"
 # Path to the ChromeDriver
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36"
 options = webdriver.ChromeOptions()
@@ -45,4 +46,8 @@ def get_links():
 
 original = get_links()
 
-Main.client.run(config('TOKEN'))       
+now = datetime.now()
+
+current_time = now.strftime("%H:%M:%S")
+
+Main.client.run(os.getenv('TOKEN'))       

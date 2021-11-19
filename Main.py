@@ -1,12 +1,11 @@
 import discord
-from decouple import config
 
 client = discord.Client()
 
 ### by default its set to 17 channel and file
 
 idd = 888376010519740457 
-file = "TwitterLinks_A17.txt"
+file = "/home/master/discord/TwitterLinks_A17.txt"
 
 async def view_history(history):
     ls = list()
@@ -42,4 +41,4 @@ async def on_ready():
     await client.close()
 
 if __name__ == '__main__':
-    client.run(config('TOKEN'))
+    client.run('ODg4MzczNjAyNzQxODAwOTcy.YURwZA.Eh22NZT0w5BR5BwoP8-EbYCxHFc')
