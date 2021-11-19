@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from time import sleep
+import Main
 PATH = r"C:\Users\yuval\Desktop\Python projects\chromedriver.exe"
 # Path to the ChromeDriver
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36"
@@ -25,11 +25,14 @@ driver = webdriver.Chrome(executable_path=PATH, options=options)
 driver.get(
     "https://twitter.com/search?q=%23DBFZ_BGK&src=typed_query&f=live")
 # Opens the intented twitter URL of Goku Blue!
+
+EC.
 def get_links():
     ls = list()
-    try:
+    try:    
         links = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//video[contains(@preload,'none')]//ancestor::article[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/a")))
+
         # Extracts the links of the tweets with videos(*this my be invalid one day) through an XPATH
         with open("TwitterLinks_GokuBlue.txt", 'w') as file:
             for link in links:
@@ -43,10 +46,5 @@ def get_links():
 
 
 original = get_links()
-while 1:
-    new = get_links()
-    if(new[0] == original[0]):
-        print('hi')
-        sleep(600)
-    else:
-        exec(open(r'C:\Users\yuval\Desktop\Discord\Main.py').read())
+#execute = Main.exe("TwitterLinks_GokuBlue.txt", 890634130390409256,
+ #                  'ODg4MzczNjAyNzQxODAwOTcy.YURwZA.ON1FMJIlxuuAr3fBgmtvOh5jr1Y')
