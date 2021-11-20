@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: a17-dis
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: a17-dis
+            image: docker.io/yuvals41/a17_dis
+            imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure

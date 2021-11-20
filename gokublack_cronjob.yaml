@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gokublack-dis
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: gokublack-dis
+            image: docker.io/yuvals41/gokublack_dis
+            imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure

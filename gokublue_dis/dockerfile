@@ -2,7 +2,7 @@ FROM python:3.10-bullseye
 
 WORKDIR /home/master/discord
 
-ENV TOKEN=ODg4MzczNjAyNzQxODAwOTcy.YURwZA.hjamfIUZvG3exyPQ2_JSzJr8VPA
+ENV TOKEN=ODg4MzczNjAyNzQxODAwOTcy.YURwZA.k-soevsEX6zfCH8hlm5Unak_gjM
 
 COPY . .
 
