@@ -1,0 +1,45 @@
+app: discordbot
+
+deployment:
+  image:
+    registry: yuvals41
+    repository: discordbot
+    tag: v1
+    pullPolicy: Always
+  rollingUpdate:
+    maxUnavailable: 50%
+    maxSurge: 50%
+  ports:
+    app: 5000
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      #cpu: "1500m"
+  healthProbes: 
+    enabled: false
+    readinessProbe:
+      enabled: true
+      path: /ready
+      port: 5000
+    livenessProbe:
+      enabled: false
+      path: /ready
+      port: 5000
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1500
+    runAsGroup: 1500
+  podAnnotations: {}
+
+service:
+  type: ClusterIP
+  protocol: TCP
+  port: 80
+
+ingress:
+  enabled: false
+  hostname: localhost
+  path: /
