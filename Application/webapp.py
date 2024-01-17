@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
 from dotenv import load_dotenv
 import json
@@ -30,6 +30,7 @@ def request_github_api(url: str, headers: dict):
 
 
 def get_repo_names():
+    repo_names = {}
     headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {GITHUB_TOKEN}"
@@ -46,15 +47,14 @@ def get_repo_names():
         repo_num = i + 1
         # repo_names.update({f"repo-name{i}": name["name"]})
         repo_names[f"repo-name{repo_num}"] =  data["name"]
-    repo_names = json.dumps(repo_names)
 
     logging.info("created repos json")
 
-    return repo_names,200
+    return jsonify(repo_names),200
 
 
 def check_private_repos():
-    non_private_repos = dict()
+    non_private_repos = []
 
     headers = {
         "Accept": "application/vnd.github+json",
@@ -71,12 +71,41 @@ def check_private_repos():
     
         return jsonify({"message":"all repos are not private"}),500
     
-    for i, repo in enumerate(repos):
-        repo_num = i + 1
+    for repo in repos:
         if repo["private"] == False:
-            non_private_repos[f"repo{repo_num}"] = repo["name"]
+            non_private_repos.append(repo["name"])
         
     return jsonify({"message": f"these are the non private repos: {non_private_repos}"}), 200
+
+def create_git_repo():
+    headers = {
+        "Accept": "application/vnd.github+json",
+        f"Authorization": "Bearer {GITHUB_TOKEN}",
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+
+    try:
+        try:
+            user_data = request.json
+            # return jsonify(f"data received: {data}"), 201
+            logging.info(f"data received: {user_data}")
+        except Exception as e:
+            logging.error(f"Missing data: {e}")
+            return jsonify("bad request"), 400
+        
+        if not user_data["repo_name"] or not user_data["private"]:
+            logging.error("Body does not contain repo_name or private fields")
+            return jsonify("Body does not contain repo name or specified if repo is private"), 400
+        
+        logging.info("creating repo in github")
+        requests.post(f"https://api.github.com/{GITHUB_USER}/repos",data=user_data,headers=headers) #TODO  need to create new token with read permissions
+        # print(response)
+
+    except Exception as e:
+        logging.error(f"An error has a occured while trying to create github repo {e}")
+        return e, 500
+
+
 
 
 
@@ -93,6 +122,10 @@ def get_repos():
 @app.route("/ready")
 def ready():
     return jsonify({"status": "healthy"}),200
+
+@app.route("/create-repo",methods=['POST'])
+def create_repo():
+    return create_git_repo()
 
 
 if __name__ == "__main__":

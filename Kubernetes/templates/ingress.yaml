@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: "{{ $.Chart.Name }}-{{ $.Values.app }}"
+  name: {{ $.Chart.Name }}
   labels:
     app: {{ $.Values.app }}
   {{- with $.Values.ingress.annotations }}
@@ -19,7 +19,7 @@ spec:
         path: {{ $.Values.ingress.path }}
         backend:
           service:
-            name: "{{ $.Chart.Name }}-{{ $.Values.app }}"
+            name: {{ $.Chart.Name }}
             port:
               number: {{ $.Values.service.port }}
 {{- end }}

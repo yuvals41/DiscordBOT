@@ -22,7 +22,7 @@ jobs:
         username: yuvals41
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build
+    - name: Build and Push
       uses: docker/build-push-action@v5
       with:
         context: Application/

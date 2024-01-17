@@ -102,7 +102,6 @@ After one minute because the nginx controller takes a few seconds to be ready yo
 
 ```
 curl http://localhost/funnyfact
-curl http://localhost/uselessfact
 ```
 
 

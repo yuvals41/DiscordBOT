@@ -19,13 +19,13 @@ deployment:
       memory: "1Gi"
       #cpu: "1500m"
   healthProbes: 
-    enabled: false
+    enabled: true
     readinessProbe:
       enabled: true
       path: /ready
       port: 5000
     livenessProbe:
-      enabled: false
+      enabled: true
       path: /ready
       port: 5000
   securityContext:
@@ -40,6 +40,6 @@ service:
   port: 80
 
 ingress:
-  enabled: false
+  enabled: true
   hostname: localhost
   path: /

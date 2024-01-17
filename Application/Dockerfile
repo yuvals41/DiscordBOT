@@ -1,11 +1,11 @@
 FROM python:3.9.18-slim-bookworm as builder
 
-WORKDIR /app
 # Installing dumb-init for better process handling, usually application like Python or Node shouldnt run as process 1
 # Didnt installed gcc because there was no need for it
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
     dumb-init \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* 
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
