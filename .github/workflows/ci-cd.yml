@@ -25,11 +25,11 @@ jobs:
     - name: Build and Push
       uses: docker/build-push-action@v5
       with:
-        context: Application/
+        context: Application/webapp
         push: true
         load: false
         # tags: yuvals41/discordbot:${{ github.run_number }}
-        tags: yuvals41/discordbot:v1
+        tags: yuvals41/webapp:v1
         cache-from: |
           type=s3,region=eu-west-1,bucket=docker-cache-dammi,access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }},secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}
         cache-to: |

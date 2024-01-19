@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import requests
 from dotenv import load_dotenv
 import json
@@ -10,6 +10,7 @@ load_dotenv()
 
 GITHUB_USER = os.environ.get("GITHUB_USER") or "yuvals41"
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+available_routes = ["/create-repo", "/ready", "/get-repos", "/check-repos-private"]
 
 if not GITHUB_TOKEN:
     logging.error("GitHub token not set. Exiting.")
@@ -106,9 +107,6 @@ def create_git_repo():
         return e, 500
 
 
-
-
-
 @app.route('/check-repos-private')
 def check_private():
     return check_private_repos()
@@ -126,6 +124,10 @@ def ready():
 @app.route("/create-repo",methods=['POST'])
 def create_repo():
     return create_git_repo()
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("error_html.html",available_routes=available_routes)
 
 
 if __name__ == "__main__":
