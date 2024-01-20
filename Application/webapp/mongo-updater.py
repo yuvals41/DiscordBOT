@@ -22,6 +22,29 @@ else:
 client = MongoClient(f"mongodb://{auth}{DB_HOST}",27017,directConnection=DIRECT_CONNECTION)
 db = client["yuval"]
 
+
+def insert_doc(collection_name: str, create_collection: bool, doc: dict):
+
+    if collection_name not in db.list_collection_names():
+        if create_collection:
+            logging.info(f"Creating collection: {collection_name}")
+            db.create_collection(collection_name)
+        else:
+            logging.error(f"Collection '{collection_name}' doesn't exist, and create_collection is set to False.")
+            return None
+    
+    collection = db.get_collection(collection_name)
+
+    try:
+        logging.info("Updating collection")
+        post_id = collection.insert_one(doc).inserted_id
+        return post_id
+    except Exception as e:
+        logging.error(f"Failed to insert document into collection '{collection_name}': {e}")
+        return None
+
+
+
 def update_repos():
     try:
         data = request.get_json()
@@ -39,14 +62,11 @@ def update_repos():
         "timestamp": data["timestamp"]
     }
 
-    if "githubRepos" not in db.list_collection_names():
-        db.create_collection("githubRepos")
-        logging.info("Created githubRepos collection")
+    post_id = insert_doc(collection_name="githubRepos",create_collection=True,doc=doc)
 
-    collection = db.get_collection("githubRepos")
-
-    logging.info("updating collection")
-    post_id = collection.insert_one(doc).inserted_id
+    if post_id is None:
+        logging.error("Failed to update mongodb")
+        return jsonify("Internal error"), 500
 
     return jsonify({"post_id": str(post_id)}), 200
 
