@@ -4,12 +4,14 @@ from dotenv import load_dotenv
 import json
 import logging
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 load_dotenv()
 
 GITHUB_USER = os.environ.get("GITHUB_USER") or "yuvals41"
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+MONGO_UPDATER_HOST = os.getenv('MONGO_UPDATER_HOST') or "mongo-updater"
 available_routes = ["/create-repo", "/ready", "/get-repos", "/check-repos-private"]
 
 if not GITHUB_TOKEN:
@@ -19,13 +21,14 @@ if not GITHUB_TOKEN:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def request_github_api(url: str, headers: dict):
+
+def request_to_endpoint(url: str, headers={},data={},json={}):
     try:
-        response = requests.get(url, headers=headers, timeout=5)
+        response = requests.get(url, headers=headers,data=data,json=json, timeout=20)
         response.raise_for_status()
-        return response.json()
+        return response.json(),response.status_code
     except requests.RequestException as e:
-        logging.error(f"Request error: {e}")
+        logging.error(f"Error sending request to {url}: {e}")
         return None
 
 
@@ -38,7 +41,7 @@ def get_repo_names():
     }
 
     logging.info("Requesting GitHub repos")
-    repos = request_github_api(f"https://api.github.com/users/{GITHUB_USER}/repos", headers)
+    repos, _ = request_to_endpoint(f"https://api.github.com/users/{GITHUB_USER}/repos", headers)
 
     if repos is None:
         return jsonify({"error": "Error requesting GitHub API"}), 500
@@ -50,6 +53,19 @@ def get_repo_names():
         repo_names[f"repo-name{repo_num}"] =  data["name"]
 
     logging.info("created repos json")
+    
+    mongo_updater_header = {
+        "Content-Type": "application/json"
+    }
+    timestamp = str(datetime.now())
+    response_post_id, status = request_to_endpoint(f"http://{MONGO_UPDATER_HOST}/current-git-repo",headers=mongo_updater_header,json={"repo_names": repos,"timestamp": timestamp})
+    logging.info(f"mongo updater response: {response_post_id}")
+
+    if status != 200:
+        logging.error("failed to send request to db updater")
+        return jsonify(f"Internal Error: {response_post_id}"), 500
+    
+    logging.info(f"successfuly updated in mongo,response: {response_post_id}")
 
     return jsonify(repo_names),200
 
@@ -63,7 +79,7 @@ def check_private_repos():
     }
 
     logging.info("Checking for private repos")
-    repos = request_github_api(f"https://api.github.com/users/{GITHUB_USER}/repos", headers)
+    repos, _ = request_to_endpoint(f"https://api.github.com/users/{GITHUB_USER}/repos", headers)
 
     if repos is None:
         return jsonify({"error": "Error requesting GitHub API"}), 500
@@ -81,30 +97,33 @@ def check_private_repos():
 def create_git_repo():
     headers = {
         "Accept": "application/vnd.github+json",
-        f"Authorization": "Bearer {GITHUB_TOKEN}",
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
         "X-GitHub-Api-Version": "2022-11-28"
     }
 
     try:
-        try:
-            user_data = request.json
-            # return jsonify(f"data received: {data}"), 201
-            logging.info(f"data received: {user_data}")
-        except Exception as e:
-            logging.error(f"Missing data: {e}")
-            return jsonify("bad request"), 400
-        
-        if not user_data["repo_name"] or not user_data["private"]:
-            logging.error("Body does not contain repo_name or private fields")
-            return jsonify("Body does not contain repo name or specified if repo is private"), 400
-        
-        logging.info("creating repo in github")
-        requests.post(f"https://api.github.com/{GITHUB_USER}/repos",data=user_data,headers=headers) #TODO  need to create new token with read permissions
-        # print(response)
-
+        user_data = request.get_json()
+        logging.info(f"Data received: {user_data}")
     except Exception as e:
-        logging.error(f"An error has a occured while trying to create github repo {e}")
-        return e, 500
+        logging.error(f"Missing or invalid data: {e}")
+        return jsonify({"error": "Bad request"}), 400
+
+    if not user_data["name"] or not user_data["private"]:
+        logging.error("Body does not contain name or private fields")
+        return jsonify({"error": "Body must contain name and private fields"}), 400
+
+    try:
+        logging.info("Creating repo in GitHub")
+        response = requests.post(f"https://api.github.com/user/repos", json=user_data, headers=headers)
+        response.raise_for_status()
+        return jsonify({"message": "Repository created successfully"}), 201
+    
+    except requests.RequestException as e:
+        logging.error(f"Request error: {e}")
+        return None
+    except Exception as e:
+        logging.error(f"An error occurred while trying to create GitHub repo: {e}")
+        return jsonify({"error": "Failed to create repository"}), 500
 
 
 @app.route('/check-repos-private')
@@ -131,4 +150,4 @@ def page_not_found(error):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)

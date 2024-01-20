@@ -3,3 +3,8 @@
 Jenkinsfile
 *.md
 mongo-data
+docker-compose.yaml
+Jenkinsfile
+.git
+__pycache__
+mongo-data

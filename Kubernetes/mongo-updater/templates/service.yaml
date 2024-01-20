@@ -15,4 +15,4 @@ spec:
       {{- if $.Values.service.nodePortapp }}
       nodePort: {{ $.Values.service.nodePortapp }}
       {{- end }}
-      name: "{{ $.Chart.Name }}"
+      name: {{ $.Chart.Name }}

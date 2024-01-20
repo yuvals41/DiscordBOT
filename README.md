@@ -16,15 +16,14 @@ git clone the repo
 
 # For local Tests with docker only
 ```
-docker compose --file Application/docker-compose.yaml up -d
+docker compose --build --file Application/webapp up -d
 ```
 
 test it
 ```
-curl http://localhost:8080/funnyfact
+curl http://localhost:8080/get-repos
+curl http://localhost:8080/check-repos-private
 curl http://localhost:8080/ready
-curl http://localhost:8081/uselessfact
-curl http://localhost:8081/ready
 ```
 
 # For Local Kubernetes
@@ -92,27 +91,23 @@ helm upgrade --install -n kube-system ingress-nginx ingress-nginx/ingress-nginx 
     --set controller.admissionWebhooks.enabled=false
 ```
 
+## Create secret for github token
+
+kubectl create secret generic github-token --from-literal=GITHUB_TOKEN=you-token
+
+
 
 ## Install both services
 ```
-helm upgrade --install discordbot Kubernetes/
+kubectl apply -f Kubernetes/mongodb
+helm upgrade --install webapp Kubernetes/webapp
+helm upgrade --install mongo-updater Kubernetes/mongo-updater
 ```
 
-After one minute because the nginx controller takes a few seconds to be ready you can try to access the endpoints
-
+## Use port forward to test the app
 ```
-curl http://localhost/funnyfact
+POD_NAME=$(kubectl get pods -l app=webapp -o name)
+
+kubectl port-forward $POD_NAME 8080:8080
 ```
 
-
-## NOTES
-
-- In the assignment, it was written to use two domains, because it's a local development it's not possible(unless you change the hosts file) so I used localhost for this I hope it's okay
-
-- In the assignment, in the GitHub actions part it was written to deploy the helm chart with GitHub actions workflow, because it's a local cluster it's not possible to a GitHub machine to deploy it on my local cluster so I wrote the commands to deploy my chart but I ignored the error because it will fail, I did it for reference points and so it will continue to the next step, you can see it on .github/workflows/ci-cd.yml file.
-  basically, I assume the the pipeline will deploy to a cluster where the applications are exposed in domain-1 and domain-2 to the world, but on my local cluster chart I exposed the ingress only to localhost with the two routes so you can see I exposed them properly, if it was on a public Kubernetes cluster I would expose those domains on the ingress and route them to the right microservices
-- Why i dont limit my cpu on the pod's containers(Its very interesting) -> https://medium.com/directeam/kubernetes-resources-under-the-hood-part-3-6ee7d6015965
-
-If you have any questions or wonders feel free to ask me what and why i did
-
-Enjoy and Thank you!

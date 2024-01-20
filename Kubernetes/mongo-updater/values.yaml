@@ -1,16 +1,21 @@
-app: discordbot
+app: mongo-updater
 
 deployment:
   image:
     registry: yuvals41
-    repository: discordbot
+    repository: webapp
     tag: v1
     pullPolicy: Always
   rollingUpdate:
     maxUnavailable: 50%
     maxSurge: 50%
   ports:
-    app: 5000
+    app: 8080
+  env:
+    - name: DB_HOST
+      value: mongodb
+    - name: DIRECT_CONNECTION
+      value: "true"
   resources:
     requests:
       memory: "128Mi"
@@ -18,16 +23,18 @@ deployment:
     limits:
       memory: "1Gi"
       #cpu: "1500m"
+  command: "python3"
+  args: "mongo-updater.py"
   healthProbes: 
     enabled: true
     readinessProbe:
       enabled: true
       path: /ready
-      port: 5000
+      port: 8080
     livenessProbe:
       enabled: true
       path: /ready
-      port: 5000
+      port: 8080
   securityContext:
     runAsNonRoot: true
     runAsUser: 1500
@@ -40,6 +47,6 @@ service:
   port: 80
 
 ingress:
-  enabled: true
+  enabled: false
   hostname: localhost
   path: /

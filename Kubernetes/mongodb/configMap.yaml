@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-init-config
+data:
+  init-mongo.js: |
+    if(rs.isMaster().info === "Does not have a valid replica set config"){
+      print("configure replicaset");
+      var config = {
+          "_id": "rs0",
+          "version": 1,
+          "members": [
+              {
+                  "_id": 0,
+                  "host": "mongodb-0:27017",
+                  "priority": 2,
+                  "hidden" : false,
+                  "buildIndexes" : true,
+                  "arbiterOnly": false
+              }
+          ]
+      };
+      rs.initiate(config, { force: true });
+    }
+    print("replicaset status: "+rs.status().ok);
