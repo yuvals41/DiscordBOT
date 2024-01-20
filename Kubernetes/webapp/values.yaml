@@ -1,0 +1,55 @@
+app: webapp
+
+deployment:
+  image:
+    registry: yuvals41
+    repository: webapp
+    tag: v1
+    pullPolicy: Always
+  rollingUpdate:
+    maxUnavailable: 50%
+    maxSurge: 50%
+  ports:
+    app: 8080
+  env:
+    - name: GITHUB_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: github-token
+          key: GITHUB_TOKEN
+    - name: MONGO_UPDATER_HOST
+      value: mongo-updater
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      #cpu: "1500m"
+  command: "python3"
+  args: "webapp.py"
+  healthProbes: 
+    enabled: true
+    readinessProbe:
+      enabled: true
+      path: /ready
+      port: 8080
+    livenessProbe:
+      enabled: true
+      path: /ready
+      port: 8080
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1500
+    runAsGroup: 1500
+  podAnnotations: {}
+
+service:
+  type: ClusterIP
+  protocol: TCP
+  port: 80
+
+ingress:
+  enabled: false
+  hostname: localhost
+  path: /

@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  webapp:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    container_name: webapp
+    restart: always
+    env_file: .env
+    environment:
+      - MONGO_UPDATER_HOST=mongo-updater:8080
+    command: ["python3","webapp.py"]
+    networks:
+      - webapp
+    ports:
+      - 8080:8080
+
+  mongo-updater:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    container_name: mongo-updater
+    restart: always
+    command: ["python3","mongo-updater.py"]
+    # command: ["sleep","1d"]
+    environment:
+      - DB_HOST=mongodb
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+    networks:
+      - webapp
+
+
+  mongodb:
+    image: public.ecr.aws/docker/library/mongo:7.0.5-jammy
+    container_name: mongodb
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    networks:
+      - webapp
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo-data:/data/db
+  
+
+networks:
+  webapp:
+  

@@ -26,7 +26,6 @@ driver.get(
     "https://twitter.com/search?q=%23DBFZ_BGK&src=typed_query&f=live")
 # Opens the intented twitter URL of Goku Blue!
 
-EC.
 def get_links():
     ls = list()
     try:    

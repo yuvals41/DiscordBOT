@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  serviceName: "mongodb"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      name: mongodb
+      labels:
+        app: mongodb
+        component: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: public.ecr.aws/docker/library/mongo:7.0.5-jammy
+        command:
+          - mongod
+        args:
+          - --bind_ip_all
+          - --replSet=rs0
+          - --wiredTigerCacheSizeGB=1
+          - --noauth
+          - --quiet
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "admin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: "admin"
+        ports:
+        - containerPort: 27017
+        readinessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 5
+          timeoutSeconds: 60
+        livenessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+          timeoutSeconds: 60
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c","sleep 30s && mongosh /scripts/init-mongo.js"]
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 250m
+          limits:
+            memory: 2Gi
+        volumeMounts:
+        - name: config
+          mountPath: /scripts
+        - name: mongo-data          
+          mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          emptyDir:
+            sizeLimit: 1Gi
+        - name: config
+          configMap:
+            name: mongodb-init-config
+            items:
+            - key: init-mongo.js
+              path: init-mongo.js
